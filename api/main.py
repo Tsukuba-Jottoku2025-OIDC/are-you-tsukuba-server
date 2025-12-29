@@ -39,6 +39,11 @@ app.add_middleware(
 async def hello_world():
     return {"message": "OK"}
 
+@app.get("/verify")
+async def verify_account():
+    
+    return {"message": "OK"}
+
 
 # @app.exception_handler(ApiError)
 # async def api_error_handler(request, err: ApiError):
