@@ -1,18 +1,20 @@
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
-import os
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
+from jose import jwt
 
-def create_access_token(data: dict) -> str:
-    payload = data.copy()
-    payload["exp"] = datetime.utcnow() + timedelta(minutes=EXPIRE_MINUTES)
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+from api.config import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_EXPIRES_MINUTES
 
-def verify_token(token: str) -> dict | None:
-    try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError:
-        return None
+
+def create_access_token(payload: Dict[str, Any]) -> str:
+    """
+    開発用のローカルトークン発行（HS256想定）。
+    本番は OIDC の issuer 発行トークンを使うので、ENABLE_DEV_LOGIN=false 推奨。
+    """
+    if not JWT_SECRET_KEY:
+        raise RuntimeError("JWT_SECRET_KEY is not set for dev login")
+
+    to_encode = dict(payload)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRES_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)

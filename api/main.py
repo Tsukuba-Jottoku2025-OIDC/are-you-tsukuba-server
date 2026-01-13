@@ -1,27 +1,16 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import auth, protected
 
-app = FastAPI(
-    title="JWT検証くん",
-    description="FastAPI JWT authentication demo",
-    version="0.1.0",
-)
+app = FastAPI(title="are-you-tsukuba-server")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 任意（dev login）
+app.include_router(auth.router)
 
-@app.get("/")
+# 保護API
+app.include_router(protected.router)
+
+
+@app.get("/health")
 def health():
     return {"status": "ok"}
-
-app.include_router(auth.router)
-app.include_router(protected.router)
