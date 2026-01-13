@@ -1,15 +1,11 @@
 from fastapi import FastAPI
-
-from api.routers import auth, protected
+from api.routers.auth import router as auth_router
+from api.routers.protected import router as protected_router
 
 app = FastAPI(title="are-you-tsukuba-server")
 
-# 任意（dev login）
-app.include_router(auth.router)
-
-# 保護API
-app.include_router(protected.router)
-
+app.include_router(auth_router)
+app.include_router(protected_router)
 
 @app.get("/health")
 def health():
